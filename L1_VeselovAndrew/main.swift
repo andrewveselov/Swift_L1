@@ -2,9 +2,6 @@
 //  main.swift
 //  L1_VeselovAndrew
 //
-//  Created by Andrew Veselov on 15/03/2019.
-//  Copyright © 2019 Andrew Veselov. All rights reserved.
-//
 // Swift level 1 2019-03-14
 // Homework
 // Andrew Veselov
