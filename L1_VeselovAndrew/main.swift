@@ -97,3 +97,5 @@ for _ in 1...5 {
     depositAmount = depositAmount + depositAmount * percentage / 100
 }
 print("The deposit amount after 5 years with percentages capitalization will be \(depositAmount)")
+
+print("\n\nAll tasks done.")
