@@ -2,9 +2,6 @@
 //  main.swift
 //  L1_VeselovAndrew
 //
-//  Created by Andrew Veselov on 15/03/2019.
-//  Copyright © 2019 Andrew Veselov. All rights reserved.
-//
 // Swift level 1 2019-03-14
 // Homework
 // Andrew Veselov
@@ -20,20 +17,20 @@ import Foundation
 //
 print("Task #1. Quardic equation:")
 print("ax² + bx + c = 0")
-print("Eneter a (a≠0):")
+print("Enter a (a≠0):")
 guard var input:String = readLine(),
     let a = Double(input), a != 0 else {
         print("?Wrong input")
         exit(0)
 }
 
-print("Eneter b:")
+print("Enter b:")
 input = readLine()!
 guard let b = Double(input) else {
     print("?Wrong input")
     exit(0)
 }
-print("Eneter c:")
+print("Enter c:")
 input = readLine()!
 guard let c = Double(input) else {
     print("?Wrong input")
