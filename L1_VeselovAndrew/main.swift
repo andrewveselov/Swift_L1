@@ -2,97 +2,151 @@
 //  main.swift
 //  L1_VeselovAndrew
 //
-// Swift level 1 2019-03-14
+// Swift level 1 Lesson 2 2019-03-18
 // Homework
 // Andrew Veselov
 //
-// 1. Решить квадратное уравнение.
-// 2. Даны катеты прямоугольного треугольника. Найти площадь, периметр и гипотенузу треугольника.
-// 3. * Пользователь вводит сумму вклада в банк и годовой процент. Найти сумму вклада через 5 лет.
+// 1. Написать функцию, которая определяет, четное число или нет.
+// 2. Написать функцию, которая определяет, делится ли число без остатка на 3.
+// 3. Создать возрастающий массив из 100 чисел.
+// 4. Удалить из этого массива все четные числа и все числа, которые не делятся на 3.
+// 5. * Написать функцию, которая добавляет в массив новое число Фибоначчи, и добавить при помощи нее 100 элементов.
+// Числа Фибоначчи определяются соотношениями Fn=Fn-1 + Fn-2.
 //
+// 6. * Заполнить массив из 100 элементов различными простыми числами. Натуральное число, большее единицы, называется простым, если оно делится только на себя и на единицу. Для нахождения всех простых чисел не больше заданного числа n, следуя методу Эратосфена, нужно выполнить следующие шаги:
+// a. Выписать подряд все целые числа от двух до n (2, 3, 4, ..., n).
+// b. Пусть переменная p изначально равна двум — первому простому числу.
+// c. Зачеркнуть в списке числа от 2p до n, считая шагами по p (это будут числа, кратные p: 2p, 3p, 4p, ...).
+// d. Найти первое не зачёркнутое число в списке, большее, чем p, и присвоить значению переменной p это число.
+// e. Повторять шаги c и d, пока возможно.
 
 import Foundation
+
 // Task #1
-// 1. Решить квадратное уравнение.
-//
-print("Task #1. Quardic equation:")
-print("ax² + bx + c = 0")
-print("Enter a (a≠0):")
-guard var input:String = readLine(),
-    let a = Double(input), a != 0 else {
-        print("?Wrong input")
-        exit(0)
-}
+// 1. Написать функцию, которая определяет, четное число или нет.
 
-print("Enter b:")
-input = readLine()!
-guard let b = Double(input) else {
-    print("?Wrong input")
-    exit(0)
-}
-print("Enter c:")
-input = readLine()!
-guard let c = Double(input) else {
-    print("?Wrong input")
-    exit(0)
-}
-print("\(a)x² + \(b)x + \(c) = 0")
-
-let discriminant = b*b-4*a*c
-if discriminant == 0 {
-    let x = (-b)/(2*a)
-    print("x₁,₂ = \(x)")
-} else if discriminant < 0 {
-    print("No solutions in real numbers.")
-} else {
-    let x1 = (-b + sqrt(discriminant))/(2*a)
-    let x2 = (-b - sqrt(discriminant))/(2*a)
-    print("x₁ = \(x1) , x₂ = \(x2)")
+// The evenNumber func returns true if the argument is even and returns false if odd
+func evenNumber(number: Int) -> Bool {
+    if number % 2 == 0 {
+        return true
+    } else {
+        return false
+    }
 }
 
 // Task #2
-// 2. Даны катеты прямоугольного треугольника. Найти площадь, периметр и гипотенузу треугольника.
-//
-print("\n\nTask #2.")
-print("Enter the length of the first leg of the triangle:")
-input = readLine()!
-guard let leg1 = Double(input), leg1 > 0 else {
-    print("?Wrong input")
-    exit(0)
+// 2. Написать функцию, которая определяет, делится ли число без остатка на 3.
+
+// The dividedThree func returns true if the argument is divisible by 3 and returns false if not
+func dividedThree(number: Int) -> Bool {
+    if number % 3 == 0 {
+        return true
+    } else {
+        return false
+    }
 }
-print("Enter the length of the second leg of the triangle:")
-input = readLine()!
-guard let leg2 = Double(input), leg2 > 0 else {
-    print("?Wrong input")
-    exit(0)
-}
-let area = leg1 * leg2 / 2
-let hypotenuse = sqrt (leg1 * leg1 + leg2 * leg2)
-let perimeter = leg1 + leg2 + hypotenuse
-print("aria = \(area) perimeter = \(perimeter) hypotenuse = \(hypotenuse)")
 
 // Task #3
-// 3. * Пользователь вводит сумму вклада в банк и годовой процент. Найти сумму вклада через 5 лет.
+// 3. Создать возрастающий массив из 100 чисел.
+
+// The arrayIncreassingNumbers func fills array of the given dimension of increasing numbers
+func arrayIncreassingNumbers(array: inout [Int], dimension: Int) {
+    for i in array.count...(dimension - 1) {
+        array.append(i)
+    }
+}
+
+// Task #4
+// Удалить из этого массива все четные числа и все числа, которые не делятся на 3.
+
+// The clearArrayTwoThree func removes from the given array all numbers that are divisible by 3 or are even
+func clearArrayTwoThree(array: inout [Int]) {
+    var i = 0
+    while array.count != i {
+//        print("i=\(i) \(evenNumber(number: i)) \(dividedThree(number: i))")
+        if evenNumber(number: array[i]) || dividedThree(number: array[i]) {
+            array.remove(at: i)
+//            print("i=\(i) removed")
+        } else {
+            i += 1
+        }
+    }
+}
+
+// Task #5
+// 5. * Написать функцию, которая добавляет в массив новое число Фибоначчи, и добавить при помощи нее 100 элементов.
+// Числа Фибоначчи определяются соотношениями Fn=Fn-1 + Fn-2.
 //
-print("\n\nTask #3.")
-print("Enter deposit amount:")
-input = readLine()!
-guard let deposit = Double(input), deposit > 0 else {
-    print("?Wrong input")
-    exit(0)
+
+// The addNextFibo func adds the Fibonacci number to the next element of the array
+func addNextFibo(array: inout [Double]) {
+    switch array.count {
+    case 0:                 // the first element is known
+        array.append(0)
+    case 1:                 // the second element is known too
+        array.append(1)
+    default:
+        array.append(array[array.count - 1] + array[array.count - 2])
+    }
 }
 
-print("Enter deposit percentage:")
-input = readLine()!
-guard let percentage = Double(input), percentage >= 0 else {
-    print("?Wrong input")
-    exit(0)
-}
-var depositAmount: Double = deposit
+// Task #6
+// 6. * Заполнить массив из 100 элементов различными простыми числами. Натуральное число, большее единицы, называется простым, если оно делится только на себя и на единицу. Для нахождения всех простых чисел не больше заданного числа n, следуя методу Эратосфена, нужно выполнить следующие шаги:
+// a. Выписать подряд все целые числа от двух до n (2, 3, 4, ..., n).
+// b. Пусть переменная p изначально равна двум — первому простому числу.
+// c. Зачеркнуть в списке числа от 2p до n, считая шагами по p (это будут числа, кратные p: 2p, 3p, 4p, ...).
+// d. Найти первое не зачёркнутое число в списке, большее, чем p, и присвоить значению переменной p это число.
+// e. Повторять шаги c и d, пока возможно.
 
-for _ in 1...5 {
-    depositAmount = depositAmount + depositAmount * percentage / 100
+// The primes func returns an array of prime numbers found Eratosthenes method in the range from 1 to "width" in the amount of "numbers" (where "width" and "numbers" are func arguments)
+func primes(width: Int, numbers: Int) -> [Int] {
+    var workArray: [Int] = []
+    var index = 2
+    arrayIncreassingNumbers(array: &workArray, dimension: width)
+    workArray[1] = 0
+    while index < width {
+        if workArray[index] != 0 {
+            var j = index * 2
+            while j < width {
+                workArray[j] = 0
+                j += index
+            }
+        }
+        index += 1
+    }
+    // clear and trim array
+    var i = 0
+    while workArray.count != i {
+        if workArray[i] == 0 || i >= numbers{
+            workArray.remove(at: i)
+        } else {
+            i += 1
+        }
+    }
+    return workArray
 }
-print("The deposit amount after 5 years with percentages capitalization will be \(depositAmount)")
+    
+print("Task #3.")
+print("Creating array...")
+var arrayIncr: [Int] = []
+arrayIncreassingNumbers(array: &arrayIncr, dimension: 100)
+print(arrayIncr)
+
+print("\nTask #4.")
+print("Filtring array...")
+clearArrayTwoThree(array: &arrayIncr)
+print(arrayIncr)
+
+print("\nTask #5.")
+print("Filling the array with Fibonacci numbers...")
+var arrayFibo: [Double] = []
+for _ in 1...100 {
+    addNextFibo(array: &arrayFibo)
+}
+print(arrayFibo)
+
+print("\nTask #6.")
+print("The array with prime numbers...")
+print(primes(width: 1000, numbers: 100))
 
 print("\n\nAll tasks done.")
