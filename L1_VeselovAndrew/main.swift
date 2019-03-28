@@ -2,151 +2,207 @@
 //  main.swift
 //  L1_VeselovAndrew
 //
-// Swift level 1 Lesson 2 2019-03-18
+// Swift level 1 Lesson 3 2019-03-25
 // Homework
 // Andrew Veselov
 //
-// 1. Написать функцию, которая определяет, четное число или нет.
-// 2. Написать функцию, которая определяет, делится ли число без остатка на 3.
-// 3. Создать возрастающий массив из 100 чисел.
-// 4. Удалить из этого массива все четные числа и все числа, которые не делятся на 3.
-// 5. * Написать функцию, которая добавляет в массив новое число Фибоначчи, и добавить при помощи нее 100 элементов.
-// Числа Фибоначчи определяются соотношениями Fn=Fn-1 + Fn-2.
-//
-// 6. * Заполнить массив из 100 элементов различными простыми числами. Натуральное число, большее единицы, называется простым, если оно делится только на себя и на единицу. Для нахождения всех простых чисел не больше заданного числа n, следуя методу Эратосфена, нужно выполнить следующие шаги:
-// a. Выписать подряд все целые числа от двух до n (2, 3, 4, ..., n).
-// b. Пусть переменная p изначально равна двум — первому простому числу.
-// c. Зачеркнуть в списке числа от 2p до n, считая шагами по p (это будут числа, кратные p: 2p, 3p, 4p, ...).
-// d. Найти первое не зачёркнутое число в списке, большее, чем p, и присвоить значению переменной p это число.
-// e. Повторять шаги c и d, пока возможно.
+// 1. Описать несколько структур – любой легковой автомобиль и любой грузовик.
+// 2. Структуры должны содержать марку авто, год выпуска, объем багажника/кузова, запущен ли двигатель, открыты ли окна, заполненный объем багажника.
+// 3. Описать перечисление с возможными действиями с автомобилем: запустить/заглушить двигатель, открыть/закрыть окна, погрузить/выгрузить из кузова/багажника груз определенного объема.
+// 4. Добавить в структуры метод с одним аргументом типа перечисления, который будет менять свойства структуры в зависимости от действия.
+// 5. Инициализировать несколько экземпляров структур. Применить к ним различные действия.
+// 6. Вывести значения свойств экземпляров в консоль.
 
 import Foundation
 
-// Task #1
-// 1. Написать функцию, которая определяет, четное число или нет.
-
-// The evenNumber func returns true if the argument is even and returns false if odd
-func evenNumber(number: Int) -> Bool {
-    if number % 2 == 0 {
-        return true
-    } else {
-        return false
-    }
+enum windows {
+    case open
+    case close
 }
 
-// Task #2
-// 2. Написать функцию, которая определяет, делится ли число без остатка на 3.
-
-// The dividedThree func returns true if the argument is divisible by 3 and returns false if not
-func dividedThree(number: Int) -> Bool {
-    if number % 3 == 0 {
-        return true
-    } else {
-        return false
-    }
+enum engine {
+    case run
+    case stop
 }
 
-// Task #3
-// 3. Создать возрастающий массив из 100 чисел.
-
-// The arrayIncreassingNumbers func fills array of the given dimension of increasing numbers
-func arrayIncreassingNumbers(array: inout [Int], dimension: Int) {
-    for i in array.count...(dimension - 1) {
-        array.append(i)
-    }
+enum controlCar {
+    case engine(status: engine)
+    case windows(status: windows)
+    case putBaggageToTrunk(volume: Int)
+    case removeBaggageFromTrunk(volume: Int)
 }
 
-// Task #4
-// Удалить из этого массива все четные числа и все числа, которые не делятся на 3.
+enum controlTruck {
+    case engine(status: engine)
+    case windows(status: windows)
+    case putCargoToBody(volume: Int)
+    case removeCargoFromBody(volume: Int)
+}
 
-// The clearArrayTwoThree func removes from the given array all numbers that are divisible by 3 or are even
-func clearArrayTwoThree(array: inout [Int]) {
-    var i = 0
-    while array.count != i {
-//        print("i=\(i) \(evenNumber(number: i)) \(dividedThree(number: i))")
-        if evenNumber(number: array[i]) || dividedThree(number: array[i]) {
-            array.remove(at: i)
-//            print("i=\(i) removed")
-        } else {
-            i += 1
+// The passenger car structure
+struct passengerCar {
+    let model: String                   // Model name
+    let releaseYear: Int                // Release year
+    let trunkVolume: Int                // Trunk volume
+    var windows: windows                // Windows status
+    var engine: engine                  // Engine status
+    var trunkFreeSpace: Int {           // Trunk free space (calculated)
+        get {
+            return trunkVolume - baggageVolume
         }
     }
-}
-
-// Task #5
-// 5. * Написать функцию, которая добавляет в массив новое число Фибоначчи, и добавить при помощи нее 100 элементов.
-// Числа Фибоначчи определяются соотношениями Fn=Fn-1 + Fn-2.
-//
-
-// The addNextFibo func adds the Fibonacci number to the next element of the array
-func addNextFibo(array: inout [Double]) {
-    switch array.count {
-    case 0:                 // the first element is known
-        array.append(0)
-    case 1:                 // the second element is known too
-        array.append(1)
-    default:
-        array.append(array[array.count - 1] + array[array.count - 2])
-    }
-}
-
-// Task #6
-// 6. * Заполнить массив из 100 элементов различными простыми числами. Натуральное число, большее единицы, называется простым, если оно делится только на себя и на единицу. Для нахождения всех простых чисел не больше заданного числа n, следуя методу Эратосфена, нужно выполнить следующие шаги:
-// a. Выписать подряд все целые числа от двух до n (2, 3, 4, ..., n).
-// b. Пусть переменная p изначально равна двум — первому простому числу.
-// c. Зачеркнуть в списке числа от 2p до n, считая шагами по p (это будут числа, кратные p: 2p, 3p, 4p, ...).
-// d. Найти первое не зачёркнутое число в списке, большее, чем p, и присвоить значению переменной p это число.
-// e. Повторять шаги c и d, пока возможно.
-
-// The primes func returns an array of prime numbers found Eratosthenes method in the range from 1 to "width" in the amount of "numbers" (where "width" and "numbers" are func arguments)
-func primes(width: Int, numbers: Int) -> [Int] {
-    var workArray: [Int] = []
-    var index = 2
-    arrayIncreassingNumbers(array: &workArray, dimension: width)
-    workArray[1] = 0
-    while index < width {
-        if workArray[index] != 0 {
-            var j = index * 2
-            while j < width {
-                workArray[j] = 0
-                j += index
-            }
-        }
-        index += 1
-    }
-    // clear and trim array
-    var i = 0
-    while workArray.count != i {
-        if workArray[i] == 0 || i >= numbers{
-            workArray.remove(at: i)
-        } else {
-            i += 1
-        }
-    }
-    return workArray
-}
+    var baggageVolume: Int              // Baggage volume
     
-print("Task #3.")
-print("Creating array...")
-var arrayIncr: [Int] = []
-arrayIncreassingNumbers(array: &arrayIncr, dimension: 100)
-print(arrayIncr)
+// 4. Добавить в структуры метод с одним аргументом типа перечисления, который будет менять свойства структуры в зависимости от действия.
+    
+    // The func for control passenger car
+    mutating func control(doit: controlCar) {
+        switch doit {
+        case .engine(status: .run):
+            print ("\(model): engine switcing on...")
+            self.engine = .run
+        case .engine(status: .stop):
+            print("\(model): engine switcing off...")
+            self.engine = .stop
+        case .windows(status: .open):
+            print("\(model): windows are opening...")
+            self.windows = .open
+        case .windows(status: .close):
+            print("\(model): windows are closing...")
+            self.windows = .close
+        case .putBaggageToTrunk(let baggageVolume) where trunkFreeSpace >= baggageVolume:
+            print("\(model): baggage volume \(baggageVolume) putting in the trunk...")
+            self.baggageVolume += baggageVolume
+        case .putBaggageToTrunk(let baggageVolume):
+            print("? \(model): Not enough space in the trunk for baggage volume \(baggageVolume)")
+        case .removeBaggageFromTrunk(let baggageVolume) where self.baggageVolume >= baggageVolume:
+            print("\(model): baggage volume \(baggageVolume) removing from the trunk...")
+            self.baggageVolume -= baggageVolume
+        case .removeBaggageFromTrunk(let baggageVolume):
+            print("? \(model): No such amount of baggage(\(baggageVolume)) in the trunk")
+        }
+    }
+    
+    // Constructor
+    public init(model: String, releaseYear: Int, trunkVolume: Int) {
+        self.model = model
+        self.releaseYear = releaseYear
+        self.trunkVolume = trunkVolume
+        self.windows = .close
+        self.engine = .stop
+        self.baggageVolume = 0
+    }
+    
+    // For print description auto
+    var description: String {
+        return "Passenger car: \(model)\n" +
+        "release year: \(releaseYear)\n" +
+        "trank volume: \(trunkVolume)\n" +
+        "baggage volume: \(baggageVolume)\n" +
+        "trank free space: \(trunkFreeSpace)\n" +
+        "engine status: \(engine)\n" +
+        "windows status: \(windows)\n\n"
+    }
+}
 
-print("\nTask #4.")
-print("Filtring array...")
-clearArrayTwoThree(array: &arrayIncr)
-print(arrayIncr)
+// The truck car structure
+struct truckCar {
+    let model: String                   // Model name
+    let releaseYear: Int                // Release year
+    let bodyVolume: Int                 // Body volume
+    var windows: windows                // Windows status
+    var engine: engine                  // Engine status
+    var bodyFreeSpace: Int {            // Body free space (calculated)
+        get {
+            return bodyVolume - cargoVolume
+        }
+    }
+    var cargoVolume: Int                // Cargo volume
+    
+    // 4. Добавить в структуры метод с одним аргументом типа перечисления, который будет менять свойства структуры в зависимости от действия.
+    
+    // The func for control trunk auto
+    mutating func control(doit: controlTruck) {
+        switch doit {
+        case .engine(status: .run):
+            print ("\(model): engine switcing on...")
+            self.engine = .run
+        case .engine(status: .stop):
+            print("\(model): engine switcing off...")
+            self.engine = .stop
+        case .windows(status: .open):
+            print("\(model): windows are opening...")
+            self.windows = .open
+        case .windows(status: .close):
+            print("\(model): windows are closing...")
+            self.windows = .close
+        case .putCargoToBody(let cargoVolume) where bodyFreeSpace >= cargoVolume:
+            print("\(model): cargo volume \(cargoVolume) putting to the body...")
+            self.cargoVolume += cargoVolume
+        case .putCargoToBody(let cargoVolume):
+            print("? \(model): Not enough space in the body for cargo volume \(cargoVolume)")
+        case .removeCargoFromBody(let cargoVolume) where self.bodyVolume >= cargoVolume:
+            print("\(model): cargo volume \(cargoVolume) removing from the body...")
+            self.cargoVolume -= cargoVolume
+        case .removeCargoFromBody(let cargoVolume):
+            print("? \(model): No such amount of cargo(\(cargoVolume)) in the body")
+        }
+    }
+    
+    // Constructor
+    public init(model: String, releaseYear: Int, bodyVolume: Int) {
+        self.model = model
+        self.releaseYear = releaseYear
+        self.bodyVolume = bodyVolume
+        self.windows = .close
+        self.engine = .stop
+        self.cargoVolume = 0
+    }
+    // For print description auto
+    var description: String {
+        return "Passenger car: \(model)\n" +
+            "release year: \(releaseYear)\n" +
+            "body volume: \(bodyVolume)\n" +
+            "cargo volume: \(cargoVolume)\n" +
+            "body free space: \(bodyFreeSpace)\n" +
+            "engine status: \(engine)\n" +
+            "windows status: \(windows)\n\n"
+    }
+}
+
+// 5. Инициализировать несколько экземпляров структур. Применить к ним различные действия.
 
 print("\nTask #5.")
-print("Filling the array with Fibonacci numbers...")
-var arrayFibo: [Double] = []
-for _ in 1...100 {
-    addNextFibo(array: &arrayFibo)
-}
-print(arrayFibo)
+print("Initializing multiple instances of structures...")
+var pasCar1 = passengerCar(model: "AUDI Q7", releaseYear: 2019, trunkVolume: 50)
+var pasCar2 = passengerCar(model: "TOYOTA RAV4", releaseYear: 2018, trunkVolume: 30)
+var trunk1 = truckCar(model: "Hyundai HD 250", releaseYear: 2018, bodyVolume: 20000)
+var trunk2 = truckCar(model: "ЗиЛ 5301", releaseYear: 2019, bodyVolume: 10000)
+
+//print(pasCar1.description)
+//print(pasCar2.description)
+
+pasCar1.control(doit: .engine(status: .run))
+pasCar1.control(doit: .windows(status: .open))
+pasCar1.control(doit: .putBaggageToTrunk(volume: 50))
+pasCar1.control(doit: .removeBaggageFromTrunk(volume: 20))
+
+pasCar2.control(doit: .engine(status: .run))
+pasCar2.control(doit: .putBaggageToTrunk(volume: 50))
+
+trunk1.control(doit: .putCargoToBody(volume: 19999))
+trunk1.control(doit: .putCargoToBody(volume: 2))
+trunk1.control(doit: .engine(status: .run))
+
+trunk2.control(doit: .windows(status: .open))
+
+// 6. Вывести значения свойств экземпляров в консоль.
 
 print("\nTask #6.")
-print("The array with prime numbers...")
-print(primes(width: 1000, numbers: 100))
+print("Print descriptions...")
+print(pasCar1.description)
+print(pasCar2.description)
+print(trunk1.description)
+print(trunk2.description)
 
-print("\n\nAll tasks done.")
+print("All tasks done.")
