@@ -2,207 +2,221 @@
 //  main.swift
 //  L1_VeselovAndrew
 //
-// Swift level 1 Lesson 4 2019-03-28
+// Swift level 1 Lesson 5 2019-04-01
 // Homework
 // Andrew Veselov
 //
-// 1. Описать класс Car c общими свойствами автомобилей и пустым методом действия по аналогии с прошлым заданием.
-// 2. Описать пару его наследников trunkCar и sportСar. Подумать, какими отличительными свойствами обладают эти автомобили. Описать в каждом наследнике специфичные для него свойства.
-// 3. Взять из прошлого урока enum с действиями над автомобилем. Подумать, какие особенные действия имеет trunkCar, а какие – sportCar. Добавить эти действия в перечисление.
-// 4. В каждом подклассе переопределить метод действия с автомобилем в соответствии с его классом.
+// 1. Создать протокол «Car» и описать свойства, общие для автомобилей, а также метод действия.
+// 2. Создать расширения для протокола «Car» и реализовать в них методы конкретных действий с автомобилем: открыть/закрыть окно, запустить/заглушить двигатель и т.д. (по одному методу на действие, реализовывать следует только те действия, реализация которых общая для всех автомобилей).
+// 3. Создать два класса, имплементирующих протокол «Car» - trunkCar и sportСar. Описать в них свойства, отличающиеся для спортивного автомобиля и цистерны.
+// 4. Для каждого класса написать расширение, имплементирующее протокол CustomStringConvertible.
 // 5. Создать несколько объектов каждого класса. Применить к ним различные действия.
-// 6. Вывести значения свойств экземпляров в консоль.
+// 6. Вывести сами объекты в консоль.
 
 import Foundation
 
 enum windows {
-    case open
-    case close
+    case open, close
 }
 
 enum engine {
-    case run
-    case stop
+    case run, stop
 }
 
-// 3. Взять из прошлого урока enum с действиями над автомобилем. Подумать, какие особенные действия имеет trunkCar, а какие – sportCar. Добавить эти действия в перечисление.
+// 1. Создать протокол «Car» и описать свойства, общие для автомобилей, а также метод действия.
 
-enum controlCar {
-    case engine(status: engine)
-    case windows(status: windows)
-    case increaseSpeed(speed: Int)
-    case reduceSpeed(speed: Int)
-    case putCargoToBody(volume: Int)
-    case removeCargoFromBody(volume: Int)
-}
-
-// 1. Описать класс Car c общими свойствами автомобилей и пустым методом действия по аналогии с прошлым заданием.
-
-class Car {
-    var model: String                   // Model name
-    var releaseYear: Int                // Release year
-    var windows: windows                // Windows status
-    var engine: engine                  // Engine status
-
-    public init(model: String, releaseYear: Int) {
-        self.model = model
-        self.releaseYear = releaseYear
-        self.windows = .close
-        self.engine = .stop
-        print("Object \"\(model)\" created.")
-    }
-
-    // For control auto
-    func control(doit: controlCar) {}
+protocol Car : class {
+    var model: String { get }                       // Model name
+    var releaseYear: Int { get }                    // Release year
+    var windows: windows { get set }                // Windows status
+    var engine: engine { get set }                  // Engine status
     
-    // Print description
-    func description() {
-        print("Automobile: \(model)\n" +
-            "release year: \(releaseYear)\n" +
-            "engine status: \(engine)\n" +
-            "windows status: \(windows)")
+    // Standard methods for control auto
+    func Windows(status: windows)
+    func Engine(status: engine)
+}
+
+// 2. Создать расширения для протокола «Car» и реализовать в них методы конкретных действий с автомобилем: открыть/закрыть окно, запустить/заглушить двигатель и т.д. (по одному методу на действие, реализовывать следует только те действия, реализация которых общая для всех автомобилей).
+
+extension Car {
+
+    func Windows(status: windows) {
+        switch status {
+        case .open:
+            print("\(model): windows are opening...")
+            self.windows = .open
+        case .close:
+            print("\(model): windows are closing...")
+            windows = .close
+        }
+    }
+
+    func Engine(status: engine) {
+        switch status {
+        case .run:
+            print ("\(model): engine switcing on...")
+            self.engine = .run
+        case .stop:
+            print("\(model): engine switcing off...")
+            self.engine = .stop
+        }
     }
 }
 
-// 2. Описать пару его наследников trunkCar и sportСar. Подумать, какими отличительными свойствами обладают эти автомобили. Описать в каждом наследнике специфичные для него свойства.
+// Additional protocol TrunkCar based on the Car protocol
 
-class trunkCar: Car {
-    let bodyVolume: Int                 // Body volume
-    var bodyFreeSpace: Int {            // Body free space (calculated)
+protocol TrunkCar: Car {
+    var bodyVolume: Int {get}               // Body volume
+    var bodyFreeSpace: Int {get}            // Body free space (calculated)
+    var cargoVolume: Int {get set}          // Cargo volume
+    
+    func PutCargoToBody(volume: Int)
+    func RemoveCargoFromBody(volume: Int)
+}
+
+extension TrunkCar {
+    func PutCargoToBody(volume: Int) {
+        if bodyFreeSpace >= volume {
+            print("\(model): cargo volume \(volume) putting to the body...")
+            self.cargoVolume += volume
+        } else {
+            print("? \(model): Not enough space in the body for cargo volume \(volume)")
+        }
+    }
+    
+    func RemoveCargoFromBody(volume: Int) {
+        if self.bodyVolume >= volume {
+            print("\(model): cargo volume \(volume) removing from the body...")
+            self.cargoVolume -= volume
+        } else {
+            print("? \(model): No such amount of cargo(\(volume)) in the body")
+        }
+    }
+}
+
+// Additional protocol SportCar based on the Car protocol
+
+protocol SportCar: Car {
+    var maxSpeed: Int {get}                 // Maximal speed
+    var currentSpeed: Int {get set}         // Current speed
+    
+    func IncreaseSpeed(speed: Int)
+    func ReduceSpeed(speed: Int)
+}
+
+extension SportCar {
+    func IncreaseSpeed(speed: Int) {
+        if speed + currentSpeed <= maxSpeed {
+            print("\(model): burns to speed \(speed)...")
+            self.currentSpeed += speed
+        } else {
+            print("? \(model): can not accelerate to speed \(speed + currentSpeed) maximum speed - \(maxSpeed)")        }
+    }
+    
+    func ReduceSpeed(speed: Int) {
+        if self.currentSpeed >= speed {
+            print("\(model): slows down at \(speed)...")
+            self.currentSpeed -= speed
+        } else {
+            print("? \(model): stops...")
+            self.currentSpeed = 0
+        }
+    }
+}
+
+// 3. Создать два класса, имплементирующих протокол «Car» - trunkCar и sportСar. Описать в них свойства, отличающиеся для спортивного автомобиля и цистерны.
+
+// Protocol Car is implemented through linked TrunkCar and SportCar
+
+class trunkCar: TrunkCar {
+    var model: String
+    var releaseYear: Int
+    var windows: windows
+    var engine: engine
+    let bodyVolume: Int
+    var bodyFreeSpace: Int {                    // calculated
         get {
             return bodyVolume - cargoVolume
         }
     }
-    var cargoVolume: Int                // Cargo volume
+    var cargoVolume: Int
 
     init(model: String, releaseYear: Int, bodyVolume: Int) {
         self.bodyVolume = bodyVolume
-        cargoVolume = 0
-        super.init(model: model, releaseYear: releaseYear)
+        self.cargoVolume = 0
+        self.model = model
+        self.releaseYear = releaseYear
+        self.engine = .stop
+        self.windows = .close
     }
-
-// 4. В каждом подклассе переопределить метод действия с автомобилем в соответствии с его классом.
-
-    override func control(doit: controlCar) {
-        switch doit {
-        case .engine(status: .run):
-            print ("\(model): engine switcing on...")
-            self.engine = .run
-        case .engine(status: .stop):
-            print("\(model): engine switcing off...")
-            self.engine = .stop
-        case .windows(status: .open):
-            print("\(model): windows are opening...")
-            self.windows = .open
-        case .windows(status: .close):
-            print("\(model): windows are closing...")
-            self.windows = .close
-        case .putCargoToBody(let cargoVolume) where bodyFreeSpace >= cargoVolume:
-            print("\(model): cargo volume \(cargoVolume) putting to the body...")
-            self.cargoVolume += cargoVolume
-        case .putCargoToBody(let cargoVolume):
-            print("? \(model): Not enough space in the body for cargo volume \(cargoVolume)")
-        case .removeCargoFromBody(let cargoVolume) where self.bodyVolume >= cargoVolume:
-            print("\(model): cargo volume \(cargoVolume) removing from the body...")
-            self.cargoVolume -= cargoVolume
-        case .removeCargoFromBody(let cargoVolume):
-            print("? \(model): No such amount of cargo(\(cargoVolume)) in the body")
-        case .increaseSpeed( _):
-            print("? \(model): Уou cannot control the speed of the truck car.")
-        case .reduceSpeed( _):
-            print("? \(model): Уou cannot control the speed of the truck car.")
-        }
-    }
-    
-    override func description() {
-        super.description()
-        print("body volume: \(bodyVolume)\n" +
-            "cargo volume: \(cargoVolume)\n")
-    }
-
 }
 
-class sportСar: Car {
-    let maxSpeed: Int           // Maximal speed
-    var currentSpeed: Int       // Current speed
+class sportCar: SportCar {
+    let maxSpeed: Int
+    var currentSpeed: Int
+    var model: String
+    var releaseYear: Int
+    var windows: windows
+    var engine: engine
     
-    public init(model: String, releaseYear: Int, maxSpeed: Int) {
+    init(model: String, releaseYear: Int, maxSpeed: Int) {
         self.maxSpeed = maxSpeed
         self.currentSpeed = 0
-        super.init(model: model, releaseYear: releaseYear)
+        self.model = model
+        self.releaseYear = releaseYear
+        self.engine = .stop
+        self.windows = .close
     }
-  
-// 4. В каждом подклассе переопределить метод действия с автомобилем в соответствии с его классом.
-    
-    override func control(doit: controlCar) {
-        switch doit {
-        case .engine(status: .run):
-            print ("\(model): engine switcing on...")
-            self.engine = .run
-        case .engine(status: .stop):
-            print("\(model): engine switcing off...")
-            self.engine = .stop
-        case .windows(status: .open):
-            print("\(model): windows are opening...")
-            self.windows = .open
-        case .windows(status: .close):
-            print("\(model): windows are closing...")
-            self.windows = .close
-        case .increaseSpeed(let speed) where speed + currentSpeed <= maxSpeed:
-            print("\(model): burns to speed \(speed)...")
-            self.currentSpeed += speed
-        case .increaseSpeed(let speed):
-            print("? \(model): can not accelerate to speed \(speed + currentSpeed) maximum speed - \(maxSpeed)")
-        case .reduceSpeed(let speed) where self.currentSpeed >= speed:
-            print("\(model): slows down at \(speed)...")
-            self.currentSpeed -= speed
-        case .reduceSpeed( _):
-            print("? \(model): stops...")
-            self.currentSpeed = 0
-        case .putCargoToBody( _):
-            print("? \(model): You can not transport cargo on a sports car.")
-        case .removeCargoFromBody( _):
-            print("? \(model): You can not transport cargo on a sports car.")
-        }
-    }
+}
 
-    override func description() {
-        super.description()
-        print("max speed: \(maxSpeed)\n" +
-            "current speed: \(currentSpeed)\n")
-    }
+// 4. Для каждого класса написать расширение, имплементирующее протокол CustomStringConvertible.
 
+extension trunkCar: CustomStringConvertible {
+    var description: String {
+        return "Automobile: \(model)\n" +
+                "release year: \(releaseYear)\n" +
+                "engine status: \(engine)\n" +
+                "windows status: \(windows)\n" +
+                "body volume: \(bodyVolume)\n" +
+                "cargo volume: \(cargoVolume)\n"
+    }
+}
+
+extension sportCar: CustomStringConvertible {
+    var description: String {
+        return "Automobile: \(model)\n" +
+                "release year: \(releaseYear)\n" +
+                "engine status: \(engine)\n" +
+                "windows status: \(windows)\n" +
+                "max speed: \(maxSpeed)\n" +
+                "current speed: \(currentSpeed)\n"
+    }
 }
 
 // 5. Создать несколько объектов каждого класса. Применить к ним различные действия.
 
 print("\nTask #5.")
 print("Creating multiple class objects...")
-var sportCar1 = sportСar(model: "Maserati Levante", releaseYear: 2019, maxSpeed: 400)
-
+var sportCar1 = sportCar(model: "Maserati Levante", releaseYear: 2019, maxSpeed: 400)
 var trunkCar1 = trunkCar(model: "Hyundai HD 250", releaseYear: 2018, bodyVolume: 20000)
 var trunkCar2 = trunkCar(model: "ЗиЛ 5301", releaseYear: 2019, bodyVolume: 10000)
 print("\nObject control...")
-sportCar1.control(doit: .engine(status: .run))
-sportCar1.control(doit: .windows(status: .open))
-sportCar1.control(doit: .putCargoToBody(volume: 50))
-sportCar1.control(doit: .increaseSpeed(speed: 50))
-sportCar1.control(doit: .increaseSpeed(speed: 600))
-sportCar1.control(doit: .reduceSpeed(speed: 10))
+sportCar1.Engine(status: .run)
+sportCar1.Windows(status: .open)
+sportCar1.IncreaseSpeed(speed: 50)
+sportCar1.IncreaseSpeed(speed: 600)
+sportCar1.ReduceSpeed(speed: 10)
 
-trunkCar1.control(doit: .putCargoToBody(volume: 19999))
-trunkCar1.control(doit: .putCargoToBody(volume: 2))
-trunkCar1.control(doit: .engine(status: .run))
+trunkCar1.PutCargoToBody(volume: 19999)
+trunkCar1.PutCargoToBody(volume: 2)
+trunkCar1.Engine(status: .run)
+trunkCar2.Windows(status: .open)
 
-trunkCar2.control(doit: .windows(status: .open))
-trunkCar2.control(doit: .increaseSpeed(speed: 100))
-
-// 6. Вывести значения свойств экземпляров в консоль.
+// 6. Вывести сами объекты в консоль.
 
 print("\nTask #6.")
 print("Print descriptions...")
-sportCar1.description()
-trunkCar1.description()
-trunkCar2.description()
-
+print(sportCar1)
+print(trunkCar1)
+print(trunkCar2)
 print("All tasks done.")
