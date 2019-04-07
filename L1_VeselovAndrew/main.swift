@@ -2,221 +2,113 @@
 //  main.swift
 //  L1_VeselovAndrew
 //
-// Swift level 1 Lesson 5 2019-04-01
+// Swift level 1 Lesson 6 2019-04-04
 // Homework
 // Andrew Veselov
 //
-// 1. Создать протокол «Car» и описать свойства, общие для автомобилей, а также метод действия.
-// 2. Создать расширения для протокола «Car» и реализовать в них методы конкретных действий с автомобилем: открыть/закрыть окно, запустить/заглушить двигатель и т.д. (по одному методу на действие, реализовывать следует только те действия, реализация которых общая для всех автомобилей).
-// 3. Создать два класса, имплементирующих протокол «Car» - trunkCar и sportСar. Описать в них свойства, отличающиеся для спортивного автомобиля и цистерны.
-// 4. Для каждого класса написать расширение, имплементирующее протокол CustomStringConvertible.
-// 5. Создать несколько объектов каждого класса. Применить к ним различные действия.
-// 6. Вывести сами объекты в консоль.
+// 1. Реализовать свой тип коллекции «очередь» (queue) c использованием дженериков.
+// 2. Добавить ему несколько методов высшего порядка, полезных для этой коллекции (пример: filter для массивов)
+// 3. * Добавить свой subscript, который будет возвращать nil в случае обращения к несуществующему индексу.
 
 import Foundation
 
-enum windows {
-    case open, close
+enum grade: Int {
+    case excellent = 5
+    case good = 4
+    case fair = 3
+    case poor = 2
 }
 
-enum engine {
-    case run, stop
+enum gender {
+    case male, female
 }
 
-// 1. Создать протокол «Car» и описать свойства, общие для автомобилей, а также метод действия.
+protocol Grade {
+    var grade: grade {get set}
+}
 
-protocol Car : class {
-    var model: String { get }                       // Model name
-    var releaseYear: Int { get }                    // Release year
-    var windows: windows { get set }                // Windows status
-    var engine: engine { get set }                  // Engine status
+class Student: Grade {
+    var grade: grade
+    var name: String
+    var gender: gender
     
-    // Standard methods for control auto
-    func Windows(status: windows)
-    func Engine(status: engine)
-}
-
-// 2. Создать расширения для протокола «Car» и реализовать в них методы конкретных действий с автомобилем: открыть/закрыть окно, запустить/заглушить двигатель и т.д. (по одному методу на действие, реализовывать следует только те действия, реализация которых общая для всех автомобилей).
-
-extension Car {
-
-    func Windows(status: windows) {
-        switch status {
-        case .open:
-            print("\(model): windows are opening...")
-            self.windows = .open
-        case .close:
-            print("\(model): windows are closing...")
-            windows = .close
-        }
+    init(name: String, gender: gender, grade: grade) {
+        self.name = name
+        self.gender = gender
+        self.grade = grade
     }
-
-    func Engine(status: engine) {
-        switch status {
-        case .run:
-            print ("\(model): engine switcing on...")
-            self.engine = .run
-        case .stop:
-            print("\(model): engine switcing off...")
-            self.engine = .stop
-        }
+}
+extension Student: CustomStringConvertible {
+    var description : String {
+        return "Name: \(name), Grade: \(grade)\n"
     }
 }
 
-// Additional protocol TrunkCar based on the Car protocol
-
-protocol TrunkCar: Car {
-    var bodyVolume: Int {get}               // Body volume
-    var bodyFreeSpace: Int {get}            // Body free space (calculated)
-    var cargoVolume: Int {get set}          // Cargo volume
+struct Stack<T: Grade> {
+    private var elements: [T] = []
     
-    func PutCargoToBody(volume: Int)
-    func RemoveCargoFromBody(volume: Int)
-}
-
-extension TrunkCar {
-    func PutCargoToBody(volume: Int) {
-        if bodyFreeSpace >= volume {
-            print("\(model): cargo volume \(volume) putting to the body...")
-            self.cargoVolume += volume
-        } else {
-            print("? \(model): Not enough space in the body for cargo volume \(volume)")
-        }
+    mutating func push(_ element: T) {
+        elements.append(element)
+    }
+    mutating func pop() -> T? {
+        return elements.removeLast()
     }
     
-    func RemoveCargoFromBody(volume: Int) {
-        if self.bodyVolume >= volume {
-            print("\(model): cargo volume \(volume) removing from the body...")
-            self.cargoVolume -= volume
-        } else {
-            print("? \(model): No such amount of cargo(\(volume)) in the body")
+    var gradePointAverage: Double {
+        var summ = 0.0
+        for element in elements {
+            summ += Double(element.grade.rawValue)
         }
+        return summ / Double(elements.count)
     }
 }
 
-// Additional protocol SportCar based on the Car protocol
-
-protocol SportCar: Car {
-    var maxSpeed: Int {get}                 // Maximal speed
-    var currentSpeed: Int {get set}         // Current speed
-    
-    func IncreaseSpeed(speed: Int)
-    func ReduceSpeed(speed: Int)
-}
-
-extension SportCar {
-    func IncreaseSpeed(speed: Int) {
-        if speed + currentSpeed <= maxSpeed {
-            print("\(model): burns to speed \(speed)...")
-            self.currentSpeed += speed
-        } else {
-            print("? \(model): can not accelerate to speed \(speed + currentSpeed) maximum speed - \(maxSpeed)")        }
-    }
-    
-    func ReduceSpeed(speed: Int) {
-        if self.currentSpeed >= speed {
-            print("\(model): slows down at \(speed)...")
-            self.currentSpeed -= speed
-        } else {
-            print("? \(model): stops...")
-            self.currentSpeed = 0
+// 2. Добавить ему несколько методов высшего порядка, полезных для этой коллекции (пример: filter для массивов)
+extension Stack {
+    func filter(predicate:(T) -> Bool) -> [T] {
+        var result = [T]()
+        for i in elements {
+            if predicate(i) {
+                result.append(i)
+            }
         }
+        return result
     }
 }
 
-// 3. Создать два класса, имплементирующих протокол «Car» - trunkCar и sportСar. Описать в них свойства, отличающиеся для спортивного автомобиля и цистерны.
 
-// Protocol Car is implemented through linked TrunkCar and SportCar
-
-class trunkCar: TrunkCar {
-    var model: String
-    var releaseYear: Int
-    var windows: windows
-    var engine: engine
-    let bodyVolume: Int
-    var bodyFreeSpace: Int {                    // calculated
+// 3. * Добавить свой subscript, который будет возвращать nil в случае обращения к несуществующему индексу.
+ extension Stack {
+    // The func checks array index
+    func testIndex(index: Int) -> Bool {
+        return (elements.count - 1 >= index) && (index >= 0)
+    }
+    
+    subscript(element: Int) -> T? {
         get {
-            return bodyVolume - cargoVolume
+            return testIndex(index: element) ? elements[element] : nil
+        }
+        set(newValue) {
+            
         }
     }
-    var cargoVolume: Int
-
-    init(model: String, releaseYear: Int, bodyVolume: Int) {
-        self.bodyVolume = bodyVolume
-        self.cargoVolume = 0
-        self.model = model
-        self.releaseYear = releaseYear
-        self.engine = .stop
-        self.windows = .close
-    }
 }
 
-class sportCar: SportCar {
-    let maxSpeed: Int
-    var currentSpeed: Int
-    var model: String
-    var releaseYear: Int
-    var windows: windows
-    var engine: engine
-    
-    init(model: String, releaseYear: Int, maxSpeed: Int) {
-        self.maxSpeed = maxSpeed
-        self.currentSpeed = 0
-        self.model = model
-        self.releaseYear = releaseYear
-        self.engine = .stop
-        self.windows = .close
-    }
-}
 
-// 4. Для каждого класса написать расширение, имплементирующее протокол CustomStringConvertible.
+print("Fill the student productivity journal...")
+var journal = Stack<Student>()
+journal.push(Student(name: "Ivan Ivanov", gender: .male, grade: .excellent))
+journal.push(Student(name: "Semyon Semyonov", gender: .male, grade: .good))
+journal.push(Student(name: "Kira Moon", gender: .female, grade: .excellent))
+journal.push(Student(name: "Michael Cook", gender: .male, grade: .excellent))
+journal.push(Student(name: "Vera Vasileva", gender: .female, grade: .good))
+journal.push(Student(name: "Eva Petrova", gender: .female, grade: .poor))
 
-extension trunkCar: CustomStringConvertible {
-    var description: String {
-        return "Automobile: \(model)\n" +
-                "release year: \(releaseYear)\n" +
-                "engine status: \(engine)\n" +
-                "windows status: \(windows)\n" +
-                "body volume: \(bodyVolume)\n" +
-                "cargo volume: \(cargoVolume)\n"
-    }
-}
-
-extension sportCar: CustomStringConvertible {
-    var description: String {
-        return "Automobile: \(model)\n" +
-                "release year: \(releaseYear)\n" +
-                "engine status: \(engine)\n" +
-                "windows status: \(windows)\n" +
-                "max speed: \(maxSpeed)\n" +
-                "current speed: \(currentSpeed)\n"
-    }
-}
-
-// 5. Создать несколько объектов каждого класса. Применить к ним различные действия.
-
-print("\nTask #5.")
-print("Creating multiple class objects...")
-var sportCar1 = sportCar(model: "Maserati Levante", releaseYear: 2019, maxSpeed: 400)
-var trunkCar1 = trunkCar(model: "Hyundai HD 250", releaseYear: 2018, bodyVolume: 20000)
-var trunkCar2 = trunkCar(model: "ЗиЛ 5301", releaseYear: 2019, bodyVolume: 10000)
-print("\nObject control...")
-sportCar1.Engine(status: .run)
-sportCar1.Windows(status: .open)
-sportCar1.IncreaseSpeed(speed: 50)
-sportCar1.IncreaseSpeed(speed: 600)
-sportCar1.ReduceSpeed(speed: 10)
-
-trunkCar1.PutCargoToBody(volume: 19999)
-trunkCar1.PutCargoToBody(volume: 2)
-trunkCar1.Engine(status: .run)
-trunkCar2.Windows(status: .open)
-
-// 6. Вывести сами объекты в консоль.
-
-print("\nTask #6.")
-print("Print descriptions...")
-print(sportCar1)
-print(trunkCar1)
-print(trunkCar2)
-print("All tasks done.")
+print(journal)
+print("Average grade of students: \(journal.gradePointAverage)")
+print("\nList of female students:")
+print(journal.filter(predicate: {$0.gender == .female}))
+print("\nChecking access to non-existent array index...")
+print("index 5: \(journal[5])")
+print("index 6: \(journal[6])")
+print("\nAll tasks done.")
