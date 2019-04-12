@@ -2,13 +2,12 @@
 //  main.swift
 //  L1_VeselovAndrew
 //
-// Swift level 1 Lesson 6 2019-04-04
+// Swift level 1 Lesson 7 2019-04-09
 // Homework
 // Andrew Veselov
 //
-// 1. Реализовать свой тип коллекции «очередь» (queue) c использованием дженериков.
-// 2. Добавить ему несколько методов высшего порядка, полезных для этой коллекции (пример: filter для массивов)
-// 3. * Добавить свой subscript, который будет возвращать nil в случае обращения к несуществующему индексу.
+// 1. Придумать класс, методы которого могут создавать непоправимые ошибки. Реализовать их с помощью try/catch.
+// 2. Придумать класс, методы которого могут завершаться неудачей. Реализовать их с использованием Error.
 
 import Foundation
 
@@ -44,6 +43,11 @@ extension Student: CustomStringConvertible {
     }
 }
 
+enum StackError: Error {
+    case indexOutOfRange
+    case stackEmpty
+}
+
 struct Stack<T: Grade> {
     private var elements: [T] = []
     
@@ -53,8 +57,12 @@ struct Stack<T: Grade> {
     mutating func pop() -> T? {
         return elements.removeLast()
     }
-    
-    var gradePointAverage: Double {
+
+// 1. Придумать класс, методы которого могут создавать непоправимые ошибки. Реализовать их с помощью try/catch.
+    func gradePointAverage() throws -> Double  {
+        guard !elements.isEmpty else {
+            throw StackError.stackEmpty
+        }
         var summ = 0.0
         for element in elements {
             summ += Double(element.grade.rawValue)
@@ -63,7 +71,6 @@ struct Stack<T: Grade> {
     }
 }
 
-// 2. Добавить ему несколько методов высшего порядка, полезных для этой коллекции (пример: filter для массивов)
 extension Stack {
     func filter(predicate:(T) -> Bool) -> [T] {
         var result = [T]()
@@ -76,17 +83,17 @@ extension Stack {
     }
 }
 
-
-// 3. * Добавить свой subscript, который будет возвращать nil в случае обращения к несуществующему индексу.
  extension Stack {
     // The func checks array index
     func testIndex(index: Int) -> Bool {
         return (elements.count - 1 >= index) && (index >= 0)
     }
     
-    subscript(element: Int) -> T? {
+// 2. Придумать класс, методы которого могут завершаться неудачей. Реализовать их с использованием Error.
+    
+    subscript(element: Int) -> (T?, StackError?) {
         get {
-            return testIndex(index: element) ? elements[element] : nil
+            return testIndex(index: element) ? (elements[element], nil) : (nil, StackError.indexOutOfRange)
         }
         set(newValue) {
             
@@ -94,21 +101,38 @@ extension Stack {
     }
 }
 
+var journal = Stack<Student>()
+var gradePointAverage: Double
+
+print("Test try ... catch processing...")
+do {
+    gradePointAverage = try journal.gradePointAverage()
+    print("Average grade of students: \(gradePointAverage)")
+} catch StackError.stackEmpty {
+    print("?Error: Journal is empty.")
+}
 
 print("Fill the student productivity journal...")
-var journal = Stack<Student>()
 journal.push(Student(name: "Ivan Ivanov", gender: .male, grade: .excellent))
 journal.push(Student(name: "Semyon Semyonov", gender: .male, grade: .good))
 journal.push(Student(name: "Kira Moon", gender: .female, grade: .excellent))
 journal.push(Student(name: "Michael Cook", gender: .male, grade: .excellent))
 journal.push(Student(name: "Vera Vasileva", gender: .female, grade: .good))
 journal.push(Student(name: "Eva Petrova", gender: .female, grade: .poor))
-
 print(journal)
-print("Average grade of students: \(journal.gradePointAverage)")
-print("\nList of female students:")
-print(journal.filter(predicate: {$0.gender == .female}))
-print("\nChecking access to non-existent array index...")
-print("index 5: \(journal[5])")
-print("index 6: \(journal[6])")
+do {
+    gradePointAverage = try journal.gradePointAverage()
+    print("Average grade of students: \(gradePointAverage)")
+} catch StackError.stackEmpty {
+    print("?Error: Journal is empty.")
+}
+
+print("\nError handling test...")
+let index = 6
+if let student = journal[index].0 {
+    print("Student's name: \(student.name)")
+} else if let error = journal[index].1 {
+    print("?Error: \(error)")
+}
+
 print("\nAll tasks done.")
